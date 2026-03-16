@@ -15,6 +15,10 @@ const modal = document.getElementById("modal-panel");
 const modalTitle = document.getElementById("modal-title");
 const modalText = document.getElementById("modal-text");
 const closeModalBtn = document.getElementById("close-modal-btn");
+const settingsControls = document.getElementById("settings-controls");
+const soundToggleBtn = document.getElementById("sound-toggle-btn");
+const soundToggleIcon = document.getElementById("sound-toggle-icon");
+const soundToggleLabel = document.getElementById("sound-toggle-label");
 
 const MAX_LIVES = 6;
 
@@ -77,9 +81,10 @@ function showScreen(screenEl) {
   });
 }
 
-function openModal(title, message) {
+function openModal(title, message, showSettings = false) {
   modalTitle.textContent = title;
   modalText.textContent = message;
+  settingsControls.hidden = !showSettings;
   modal.classList.add("visible");
   modal.setAttribute("aria-hidden", "false");
 }
@@ -320,12 +325,26 @@ window.addEventListener("resize", () => {
 playAgainBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
 playAgainBtn.addEventListener("click", resetGame);
 
+function updateSoundToggle() {
+  const on = state.soundsEnabled;
+  soundToggleBtn.setAttribute("aria-pressed", String(on));
+  soundToggleIcon.textContent = on ? "🔊" : "🔇";
+  soundToggleLabel.textContent = on ? "ON" : "OFF";
+}
+
+settingsBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
 settingsBtn.addEventListener("click", () => {
-  const next = !state.soundsEnabled;
-  state.soundsEnabled = next;
-  openModal("Settings", `Sound is now ${next ? "ON" : "OFF"}.`);
+  updateSoundToggle();
+  openModal("Settings", "", true);
 });
 
+soundToggleBtn.addEventListener("click", () => {
+  state.soundsEnabled = !state.soundsEnabled;
+  unlockAudio();
+  updateSoundToggle();
+});
+
+menuBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
 menuBtn.addEventListener("click", () => {
   openModal(
     "Menu",
@@ -333,6 +352,7 @@ menuBtn.addEventListener("click", () => {
   );
 });
 
+helpBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
 helpBtn.addEventListener("click", () => {
   openModal(
     "Help",
